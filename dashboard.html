@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>South-East Melbourne — Property Scan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<style>
+  :root {
+    --ink: #1B2430;
+    --ink-soft: #3A4453;
+    --paper: #EDE7DC;
+    --paper-raised: #F7F3E9;
+    --line-frankston: #B8453D;
+    --line-glenwaverley: #3E7C59;
+    --line-sandringham: #3B5D8A;
+    --gold: #A9812E;
+    --hairline: rgba(27, 36, 48, 0.14);
+    --shadow: 0 1px 2px rgba(27,36,48,0.06), 0 8px 24px rgba(27,36,48,0.06);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3 { font-family: 'Fraunces', serif; font-weight: 600; margin: 0; }
+  .mono { font-family: 'IBM Plex Mono', monospace; }
+
+  header {
+    background: var(--ink);
+    color: var(--paper-raised);
+    padding: 28px 20px 22px;
+  }
+  .header-inner { max-width: 900px; margin: 0 auto; }
+  .brand-row { display: flex; align-items: center; gap: 16px; }
+  h1 { font-size: 1.5rem; letter-spacing: -0.01em; }
+  .subtitle {
+    font-size: 0.85rem; color: rgba(237,231,220,0.65);
+    margin-top: 4px; font-family: 'Inter', sans-serif;
+  }
+
+  main { max-width: 900px; margin: 0 auto; padding: 20px; }
+
+  .panel {
+    background: var(--paper-raised);
+    border: 1px solid var(--hairline);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    padding: 18px 20px;
+    margin-bottom: 18px;
+  }
+  .panel h2 { font-size: 1rem; margin-bottom: 10px; }
+
+  .security-note {
+    font-size: 0.82rem; line-height: 1.5; color: var(--ink-soft);
+  }
+  .security-note strong { color: var(--ink); }
+
+  .config-row {
+    display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px;
+  }
+  input[type="text"] {
+    flex: 1; min-width: 200px;
+    padding: 9px 12px; border: 1px solid var(--hairline);
+    border-radius: 6px; font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.82rem; background: #fff;
+  }
+  button {
+    padding: 9px 16px; border: none; border-radius: 6px;
+    background: var(--ink); color: var(--paper-raised);
+    font-family: 'Inter', sans-serif; font-weight: 600; font-size: 0.85rem;
+    cursor: pointer; transition: opacity 0.15s;
+  }
+  button:hover { opacity: 0.85; }
+  button.secondary {
+    background: transparent; color: var(--ink);
+    border: 1px solid var(--hairline);
+  }
+
+  .filters { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  select {
+    padding: 8px 10px; border: 1px solid var(--hairline); border-radius: 6px;
+    font-family: 'Inter', sans-serif; font-size: 0.85rem; background: #fff;
+  }
+
+  .status-line {
+    font-size: 0.8rem; color: var(--ink-soft); margin-top: 8px;
+  }
+
+  .property-card {
+    background: var(--paper-raised);
+    border: 1px solid var(--hairline);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    padding: 16px 18px;
+    margin-bottom: 12px;
+  }
+  .property-top {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 12px;
+  }
+  .property-address { font-family: 'Fraunces', serif; font-weight: 600; font-size: 1.05rem; }
+  .property-suburb { font-size: 0.82rem; color: var(--ink-soft); margin-top: 2px; }
+  .score-badge {
+    font-family: 'IBM Plex Mono', monospace; font-weight: 600;
+    font-size: 1.1rem; color: var(--gold);
+    background: rgba(169,129,46,0.1);
+    padding: 4px 10px; border-radius: 20px; white-space: nowrap;
+  }
+  .property-meta {
+    display: flex; gap: 14px; flex-wrap: wrap; margin-top: 10px;
+    font-size: 0.82rem; color: var(--ink-soft);
+  }
+  .property-meta span strong { color: var(--ink); font-family: 'IBM Plex Mono', monospace; }
+  .badges { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+  .badge {
+    font-size: 0.72rem; padding: 3px 8px; border-radius: 4px;
+    font-family: 'Inter', sans-serif; font-weight: 600;
+  }
+  .badge.line-frankston { background: rgba(184,69,61,0.12); color: var(--line-frankston); }
+  .badge.line-glenwaverley { background: rgba(62,124,89,0.12); color: var(--line-glenwaverley); }
+  .badge.line-sandringham { background: rgba(59,93,138,0.12); color: var(--line-sandringham); }
+  .badge.manual-check { background: rgba(184,69,61,0.15); color: var(--line-frankston); }
+  .badge.confidence-permit { background: rgba(62,124,89,0.15); color: var(--line-glenwaverley); }
+  .badge.confidence-keyword { background: rgba(169,129,46,0.15); color: var(--gold); }
+  .property-link {
+    display: inline-block; margin-top: 10px; font-size: 0.82rem;
+    color: var(--ink); text-decoration: underline; text-decoration-color: var(--hairline);
+  }
+
+  .empty-state {
+    text-align: center; padding: 40px 20px; color: var(--ink-soft);
+  }
+  .empty-state h3 { margin-bottom: 8px; color: var(--ink); }
+  .empty-state p { font-size: 0.88rem; line-height: 1.6; max-width: 480px; margin: 0 auto; }
+
+  .seifa-result {
+    margin-top: 10px; font-size: 0.85rem;
+    padding: 10px 12px; border-radius: 6px; background: rgba(27,36,48,0.04);
+  }
+  .seifa-result .decile { font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: var(--gold); }
+
+  footer {
+    text-align: center; padding: 24px 20px 40px;
+    font-size: 0.75rem; color: var(--ink-soft);
+  }
+
+  @media (max-width: 480px) {
+    .property-top { flex-direction: column; }
+    .score-badge { align-self: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="brand-row">
+      <svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <!-- Signature mark: the three rail lines converging at Richmond,
+             with Toorak and Heyington marked — the actual insight this
+             whole model is built on. -->
+        <circle cx="26" cy="26" r="25" stroke="rgba(237,231,220,0.25)" stroke-width="1"/>
+        <path d="M8 40 L26 26" stroke="#B8453D" stroke-width="2.2" stroke-linecap="round"/>
+        <path d="M44 40 L26 26" stroke="#3E7C59" stroke-width="2.2" stroke-linecap="round"/>
+        <path d="M26 8 L26 26" stroke="#3B5D8A" stroke-width="2.2" stroke-linecap="round"/>
+        <circle cx="26" cy="26" r="3.2" fill="#EDE7DC"/>
+        <circle cx="8" cy="40" r="2.4" fill="#B8453D"/>
+        <circle cx="44" cy="40" r="2.4" fill="#3E7C59"/>
+      </svg>
+      <div>
+        <h1>South-East Melbourne Property Scan</h1>
+        <div class="subtitle">Frankston · Glen Waverley · Sandringham lines — via Richmond</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <div class="panel">
+    <h2>How this page connects to the web</h2>
+    <p class="security-note">
+      This dashboard reads your <strong>published, read-only</strong> Google Sheet
+      (no login, no credentials) and queries ABS's public SEIFA data directly —
+      both safe to call from a browser. It never touches your Domain API key or
+      Google service account — those stay server-side in your GitHub Actions
+      pipeline, exactly as before, because a browser page can't keep a secret
+      hidden from anyone who opens it.
+    </p>
+    <div class="config-row">
+      <input type="text" id="sheetUrlInput" placeholder="Paste your published-to-web CSV link here (File → Share → Publish to web → CSV)">
+      <button onclick="loadFromSheet()">Load properties</button>
+    </div>
+    <div class="status-line" id="statusLine">Not connected yet — paste your Sheet's published CSV link above.</div>
+  </div>
+
+  <div class="panel">
+    <h2>Check a suburb's SEIFA score (live from ABS)</h2>
+    <div class="config-row">
+      <input type="text" id="suburbInput" placeholder="e.g. Armadale">
+      <button class="secondary" onclick="checkSeifa()">Check</button>
+    </div>
+    <div id="seifaResult"></div>
+  </div>
+
+  <div class="panel" id="filterPanel" style="display:none;">
+    <h2>Filter &amp; sort</h2>
+    <div class="filters">
+      <select id="typeFilter" onchange="renderProperties()">
+        <option value="">All property types</option>
+        <option value="house">House</option>
+        <option value="townhouse">Townhouse</option>
+        <option value="villa">Villa</option>
+        <option value="apartment_ground_floor">Apartment</option>
+      </select>
+      <select id="sortBy" onchange="renderProperties()">
+        <option value="priority_score">Sort: priority score</option>
+        <option value="price">Sort: price</option>
+        <option value="area_sqm">Sort: area</option>
+      </select>
+      <button class="secondary" onclick="loadFromSheet()">Refresh</button>
+    </div>
+  </div>
+
+  <div id="propertyList">
+    <div class="empty-state">
+      <h3>No properties loaded yet</h3>
+      <p>Once your GitHub Actions pipeline has run at least once and you've
+         published the results Sheet to the web, paste the CSV link above to
+         see your ranked shortlist here — checkable from your phone, no login
+         required.</p>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  Personal buyer-side tool · not a substitute for professional legal/financial advice
+</footer>
+
+<script>
+let allProperties = [];
+
+const LINE_BY_STATION = {
+  "Toorak": "frankston", "Armadale": "frankston", "Malvern": "frankston", "Caulfield": "frankston",
+  "Heyington": "glenwaverley", "Tooronga": "glenwaverley", "Gardiner": "glenwaverley", "Holmesglen": "glenwaverley",
+  "Balaclava": "sandringham", "Ripponlea": "sandringham", "Elsternwick": "sandringham",
+};
+
+function loadFromSheet() {
+  const url = document.getElementById('sheetUrlInput').value.trim();
+  const statusEl = document.getElementById('statusLine');
+  if (!url) {
+    statusEl.textContent = "Paste a published CSV link first (see README for how to publish your Sheet).";
+    return;
+  }
+  if (window.location.protocol === 'file:') {
+    statusEl.innerHTML = "You're opening this file directly (file://) — most browsers block " +
+      "fetching remote data from a local file for security. Serve this folder with " +
+      "<code>python3 -m http.server 8000</code> and open " +
+      "<code>http://localhost:8000/dashboard.html</code> instead. Trying anyway below...";
+  } else {
+    statusEl.textContent = "Loading...";
+  }
+
+  Papa.parse(url, {
+    download: true,
+    header: true,
+    skipEmptyLines: true,
+    complete: function(results) {
+      if (!results.data || results.data.length === 0) {
+        statusEl.textContent = "Loaded, but found no rows — has the pipeline run yet, or is the Sheet tab empty?";
+        return;
+      }
+      allProperties = results.data.map(row => ({
+        ...row,
+        priority_score: parseFloat(row.priority_score) || 0,
+        price: parseFloat(row.price) || 0,
+        area_sqm: parseFloat(row.area_sqm) || 0,
+      }));
+      statusEl.textContent = `Loaded ${allProperties.length} properties · last scan: ${allProperties[0].scan_timestamp || 'unknown'}`;
+      document.getElementById('filterPanel').style.display = 'block';
+      renderProperties();
+    },
+    error: function(err) {
+      const isFileProtocol = window.location.protocol === 'file:';
+      statusEl.innerHTML = isFileProtocol
+        ? "Fetch blocked — this is almost certainly the file:// issue above. Serve via " +
+          "<code>python3 -m http.server</code> and reload through <code>http://localhost</code>."
+        : "Couldn't load that link. Two things to check: (1) paste the link directly into a new " +
+          "browser tab — does it show raw CSV text, or a login/error page? If the latter, " +
+          "re-publish via File → Share → Publish to web, choosing CSV format specifically. " +
+          "(2) Open this page's browser console (F12) and look for a red CORS error for the " +
+          "exact reason the request failed.";
+      console.error("Sheet load error:", err, "URL attempted:", url);
+    }
+  });
+}
+
+function renderProperties() {
+  const typeFilter = document.getElementById('typeFilter').value;
+  const sortBy = document.getElementById('sortBy').value;
+  const listEl = document.getElementById('propertyList');
+
+  let filtered = allProperties.filter(p => !typeFilter || p.property_type === typeFilter);
+  filtered.sort((a, b) => (b[sortBy] || 0) - (a[sortBy] || 0));
+
+  if (filtered.length === 0) {
+    listEl.innerHTML = `<div class="empty-state"><h3>No matches</h3><p>Try a different property type filter.</p></div>`;
+    return;
+  }
+
+  listEl.innerHTML = filtered.map(p => {
+    const line = LINE_BY_STATION[p.nearest_station] || '';
+    const lineBadge = line ? `<span class="badge line-${line}">${p.nearest_station} · ${line === 'frankston' ? 'Frankston' : line === 'glenwaverley' ? 'Glen Waverley' : 'Sandringham'} line</span>` : '';
+    const confBadgeClass = p.renovation_confidence === 'permit_record' ? 'confidence-permit'
+                          : p.renovation_confidence === 'keyword_signal' ? 'confidence-keyword' : '';
+    const confBadge = p.renovation_confidence ? `<span class="badge ${confBadgeClass}">reno: ${p.renovation_confidence.replace('_',' ')}</span>` : '';
+    const manualBadge = (p.needs_manual_check === 'True' || p.needs_manual_check === true)
+      ? `<span class="badge manual-check">glance at photos: storeys/floor unconfirmed</span>` : '';
+
+    return `
+      <div class="property-card">
+        <div class="property-top">
+          <div>
+            <div class="property-address">${p.address || 'Address unavailable'}</div>
+            <div class="property-suburb">${p.suburb || ''}</div>
+          </div>
+          <div class="score-badge mono">${(p.priority_score || 0).toFixed(3)}</div>
+        </div>
+        <div class="property-meta">
+          <span><strong>${p.price ? '$' + Number(p.price).toLocaleString() : '—'}</strong></span>
+          <span><strong>${p.bedrooms || '—'}</strong> bed</span>
+          <span><strong>${p.car_spaces || '—'}</strong> car</span>
+          <span><strong>${p.area_sqm || '—'}</strong> sqm</span>
+          <span><strong>${p.walk_distance_m || '—'}</strong>m walk</span>
+          <span><strong>${p.transfers_required || '0'}</strong> change(s)</span>
+        </div>
+        <div class="badges">${lineBadge}${confBadge}${manualBadge}</div>
+        ${p.listing_url ? `<a class="property-link" href="${p.listing_url}" target="_blank" rel="noopener">View listing →</a>` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+async function checkSeifa() {
+  const suburb = document.getElementById('suburbInput').value.trim();
+  const resultEl = document.getElementById('seifaResult');
+  if (!suburb) return;
+  resultEl.innerHTML = `<div class="seifa-result">Checking...</div>`;
+
+  const url = `https://services-ap1.arcgis.com/ypkPEy1AmwPKGNNv/arcgis/rest/services/ABS_Socio_Economic_Indexes_for_Areas_SEIFA_by_2021_SAL/FeatureServer/0/query`;
+  const params = new URLSearchParams({
+    where: `UPPER(sal_name_2021) LIKE UPPER('%${suburb}%')`,
+    outFields: 'sal_name_2021,irsad_aus_decile,irsad_score',
+    f: 'json',
+  });
+
+  try {
+    const resp = await fetch(`${url}?${params.toString()}`);
+    const data = await resp.json();
+    const features = data.features || [];
+    if (features.length === 0) {
+      resultEl.innerHTML = `<div class="seifa-result">No match found for "${suburb}" — try the exact suburb name (e.g. "Malvern East" not "Malvern east vic").</div>`;
+      return;
+    }
+    resultEl.innerHTML = features.map(f => {
+      const a = f.attributes;
+      return `<div class="seifa-result">
+        <strong>${a.sal_name_2021}</strong> — IRSAD decile:
+        <span class="decile">${a.irsad_aus_decile}/10</span>
+        (10 = most advantaged nationally)
+      </div>`;
+    }).join('');
+  } catch (err) {
+    resultEl.innerHTML = `<div class="seifa-result">Couldn't reach ABS's service right now — try again shortly.</div>`;
+  }
+}
+</script>
+
+</body>
+</html>
