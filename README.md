@@ -102,6 +102,23 @@ Open `dashboard.html` in any browser (double-click it, or host it anywhere
 - Never touches Domain or your Google credentials, by design (see the
   note on the page itself for why).
 
+## Testing the Sheets pipeline BEFORE Domain access arrives
+
+Once you've deployed the Apps Script Web App (section 2), test it with
+mock data — this isolates "does my Sheets pipeline work" from "does my
+Domain API key work", so if something breaks later you know which half
+to debug:
+
+```bash
+export APPS_SCRIPT_WEB_APP_URL="your-web-app-url-here"
+export APPS_SCRIPT_SHARED_SECRET="your-random-secret-here"
+python3 test_sheets_writer.py
+```
+
+This writes 4 clearly-fake properties (e.g. "MOCK-1", "12 Sample St") into
+your real Sheet's "Ranked Properties" tab — check they appear, then you
+know the whole write path works independent of Domain.
+
 ## Testing locally before relying on the schedule
 
 ```bash
@@ -114,6 +131,17 @@ python3 main.py
 
 If the Apps Script env vars are left unset, it falls back to writing a local
 `ranked_properties.csv` instead — useful for a first test run.
+
+## Reading a scan result correctly
+
+- **Red X on the Actions run** = every single suburb fetch failed — almost
+  always a bad/placeholder `DOMAIN_API_KEY` or a Domain outage. Check the
+  expanded "Run property scan" log for the actual error.
+- **Green check, but the Sheet is empty** = fetches genuinely succeeded,
+  nothing matched your price/bedroom/etc. filters this run. This is a
+  normal, legitimate outcome, not a bug.
+- Both of these used to look identical (green check either way) until this
+  was fixed — worth knowing if you're looking at an older run.
 
 ## Things this automation does NOT cover (do these manually)
 
@@ -146,3 +174,5 @@ If the Apps Script env vars are left unset, it falls back to writing a local
   proving the scoring logic itself is correct, independent of any live API
 - `test_ingestion.py` — proves the Domain field-mapping logic is correct
   against Domain's own documented response shape
+- `test_sheets_writer.py` — proves the Apps Script write path works using
+  mock data, before Domain access is available

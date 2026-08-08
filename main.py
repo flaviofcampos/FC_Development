@@ -52,6 +52,7 @@ def run_pipeline():
     suburb_scores = build_suburb_family_scores(TARGET_SUBURBS)
 
     all_normalized = []
+    fetch_failures = 0
     print("\nFetching listings per suburb...")
     for suburb in TARGET_SUBURBS:
         try:
@@ -61,6 +62,7 @@ def run_pipeline():
                 max_price=HARD_FILTERS["max_price"],
             )
         except Exception as e:
+            fetch_failures += 1
             print(f"  WARNING: fetch failed for {suburb}: {e}", file=sys.stderr)
             continue
 
@@ -71,7 +73,23 @@ def run_pipeline():
         print(f"  {suburb}: {len(raw_listings)} raw -> "
               f"{sum(1 for r in raw_listings if normalize_listing(r))} usable")
 
-    print(f"\nTotal usable listings across all suburbs: {len(all_normalized)}")
+    # CRITICAL DISTINCTION: if every single suburb fetch failed, that's a
+    # real problem (almost certainly a bad/placeholder Domain key or an API
+    # outage) — not a legitimate "no matching properties" outcome. Treat it
+    # as a hard failure so GitHub Actions actually shows a red X, rather
+    # than silently succeeding with zero results (which is what happened
+    # on the very first test run with a placeholder key — worth flagging
+    # loudly rather than let it look identical to a clean, empty result).
+    if fetch_failures == len(TARGET_SUBURBS):
+        print(f"\nERROR: ALL {len(TARGET_SUBURBS)} suburb fetches failed. "
+              "This is almost certainly a bad/placeholder DOMAIN_API_KEY, "
+              "not a genuine 'no properties matched' result. Check the "
+              "warnings above for the actual error Domain returned.",
+              file=sys.stderr)
+        sys.exit(1)
+
+    print(f"\nTotal usable listings across all suburbs: {len(all_normalized)}"
+          f" ({fetch_failures} of {len(TARGET_SUBURBS)} suburb fetches failed)")
 
     results = []
     for prop in all_normalized:
@@ -82,7 +100,9 @@ def run_pipeline():
         results.append({**prop, **score})
 
     if not results:
-        print("No properties passed the hard filters this run.")
+        print("No properties passed the hard filters this run — "
+              "this IS a legitimate outcome (fetches succeeded, just "
+              "nothing matched your criteria this time).")
         return pd.DataFrame()
 
     df = pd.DataFrame(results)
