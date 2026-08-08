@@ -11,14 +11,16 @@
   :root {
     --ink: #1B2430;
     --ink-soft: #3A4453;
+    --ink-faint: #6B7480;
     --paper: #EDE7DC;
     --paper-raised: #F7F3E9;
     --line-frankston: #B8453D;
     --line-glenwaverley: #3E7C59;
     --line-sandringham: #3B5D8A;
     --gold: #A9812E;
-    --hairline: rgba(27, 36, 48, 0.14);
-    --shadow: 0 1px 2px rgba(27,36,48,0.06), 0 8px 24px rgba(27,36,48,0.06);
+    --hairline: rgba(27, 36, 48, 0.12);
+    --shadow: 0 1px 2px rgba(27,36,48,0.05), 0 8px 24px rgba(27,36,48,0.06);
+    --shadow-lg: 0 4px 12px rgba(27,36,48,0.10), 0 20px 48px rgba(27,36,48,0.14);
   }
   * { box-sizing: border-box; }
   html, body {
@@ -30,129 +32,162 @@
   }
   h1, h2, h3 { font-family: 'Fraunces', serif; font-weight: 600; margin: 0; }
   .mono { font-family: 'IBM Plex Mono', monospace; }
+  button { font-family: 'Inter', sans-serif; cursor: pointer; }
 
   header {
     background: var(--ink);
     color: var(--paper-raised);
-    padding: 28px 20px 22px;
+    padding: 22px 20px;
+    position: sticky; top: 0; z-index: 20;
   }
-  .header-inner { max-width: 900px; margin: 0 auto; }
-  .brand-row { display: flex; align-items: center; gap: 16px; }
-  h1 { font-size: 1.5rem; letter-spacing: -0.01em; }
-  .subtitle {
-    font-size: 0.85rem; color: rgba(237,231,220,0.65);
-    margin-top: 4px; font-family: 'Inter', sans-serif;
+  .header-inner {
+    max-width: 900px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .brand-row { display: flex; align-items: center; gap: 14px; }
+  h1 { font-size: 1.35rem; letter-spacing: -0.01em; line-height: 1.2; }
+  .subtitle { font-size: 0.78rem; color: rgba(237,231,220,0.6); margin-top: 3px; }
+
+  .icon-btn {
+    width: 38px; height: 38px; border-radius: 50%;
+    border: 1px solid rgba(237,231,220,0.2); background: rgba(237,231,220,0.06);
+    color: var(--paper-raised); display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+  }
+  .icon-btn:hover { background: rgba(237,231,220,0.16); }
+
+  main { max-width: 900px; margin: 0 auto; padding: 22px 20px 40px; }
+
+  /* ---------- Summary bar ---------- */
+  .summary-bar {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+    margin-bottom: 20px;
+  }
+  .summary-stat {
+    background: var(--paper-raised); border: 1px solid var(--hairline);
+    border-radius: 10px; padding: 12px 14px; box-shadow: var(--shadow);
+  }
+  .summary-stat .value {
+    font-family: 'Fraunces', serif; font-weight: 600; font-size: 1.3rem; color: var(--ink);
+  }
+  .summary-stat .label { font-size: 0.72rem; color: var(--ink-faint); margin-top: 2px; }
+  .last-updated {
+    font-size: 0.78rem; color: var(--ink-soft); margin-bottom: 16px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .last-updated .dot {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--line-glenwaverley);
   }
 
-  main { max-width: 900px; margin: 0 auto; padding: 20px; }
+  /* ---------- Filter pills ---------- */
+  .filter-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+  .pill-group { display: flex; gap: 4px; background: var(--paper-raised); border: 1px solid var(--hairline); border-radius: 20px; padding: 3px; }
+  .pill {
+    border: none; background: transparent; padding: 6px 13px; border-radius: 16px;
+    font-size: 0.8rem; font-weight: 500; color: var(--ink-soft);
+    transition: background 0.15s, color 0.15s;
+  }
+  .pill.active { background: var(--ink); color: var(--paper-raised); }
 
-  .panel {
-    background: var(--paper-raised);
-    border: 1px solid var(--hairline);
-    border-radius: 10px;
-    box-shadow: var(--shadow);
-    padding: 18px 20px;
-    margin-bottom: 18px;
-  }
-  .panel h2 { font-size: 1rem; margin-bottom: 10px; }
-
-  .security-note {
-    font-size: 0.82rem; line-height: 1.5; color: var(--ink-soft);
-  }
-  .security-note strong { color: var(--ink); }
-
-  .config-row {
-    display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px;
-  }
-  input[type="text"] {
-    flex: 1; min-width: 200px;
-    padding: 9px 12px; border: 1px solid var(--hairline);
-    border-radius: 6px; font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.82rem; background: #fff;
-  }
-  button {
-    padding: 9px 16px; border: none; border-radius: 6px;
-    background: var(--ink); color: var(--paper-raised);
-    font-family: 'Inter', sans-serif; font-weight: 600; font-size: 0.85rem;
-    cursor: pointer; transition: opacity 0.15s;
-  }
-  button:hover { opacity: 0.85; }
-  button.secondary {
-    background: transparent; color: var(--ink);
-    border: 1px solid var(--hairline);
-  }
-
-  .filters { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-  select {
-    padding: 8px 10px; border: 1px solid var(--hairline); border-radius: 6px;
-    font-family: 'Inter', sans-serif; font-size: 0.85rem; background: #fff;
-  }
-
-  .status-line {
-    font-size: 0.8rem; color: var(--ink-soft); margin-top: 8px;
-  }
-
+  /* ---------- Property cards ---------- */
   .property-card {
     background: var(--paper-raised);
     border: 1px solid var(--hairline);
-    border-radius: 10px;
+    border-radius: 12px;
     box-shadow: var(--shadow);
     padding: 16px 18px;
     margin-bottom: 12px;
   }
-  .property-top {
-    display: flex; justify-content: space-between; align-items: flex-start;
-    gap: 12px;
-  }
+  .property-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
   .property-address { font-family: 'Fraunces', serif; font-weight: 600; font-size: 1.05rem; }
-  .property-suburb { font-size: 0.82rem; color: var(--ink-soft); margin-top: 2px; }
+  .property-suburb { font-size: 0.82rem; color: var(--ink-faint); margin-top: 2px; }
   .score-badge {
-    font-family: 'IBM Plex Mono', monospace; font-weight: 600;
-    font-size: 1.1rem; color: var(--gold);
-    background: rgba(169,129,46,0.1);
-    padding: 4px 10px; border-radius: 20px; white-space: nowrap;
+    font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 1.05rem; color: var(--gold);
+    background: rgba(169,129,46,0.1); padding: 4px 11px; border-radius: 20px; white-space: nowrap;
   }
   .property-meta {
     display: flex; gap: 14px; flex-wrap: wrap; margin-top: 10px;
     font-size: 0.82rem; color: var(--ink-soft);
   }
-  .property-meta span strong { color: var(--ink); font-family: 'IBM Plex Mono', monospace; }
+  .property-meta span strong { color: var(--ink); font-family: 'IBM Plex Mono', monospace; font-weight: 500; }
   .badges { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
-  .badge {
-    font-size: 0.72rem; padding: 3px 8px; border-radius: 4px;
-    font-family: 'Inter', sans-serif; font-weight: 600;
-  }
+  .badge { font-size: 0.71rem; padding: 3px 8px; border-radius: 4px; font-weight: 600; }
   .badge.line-frankston { background: rgba(184,69,61,0.12); color: var(--line-frankston); }
   .badge.line-glenwaverley { background: rgba(62,124,89,0.12); color: var(--line-glenwaverley); }
   .badge.line-sandringham { background: rgba(59,93,138,0.12); color: var(--line-sandringham); }
-  .badge.manual-check { background: rgba(184,69,61,0.15); color: var(--line-frankston); }
-  .badge.confidence-permit { background: rgba(62,124,89,0.15); color: var(--line-glenwaverley); }
-  .badge.confidence-keyword { background: rgba(169,129,46,0.15); color: var(--gold); }
+  .badge.manual-check { background: rgba(184,69,61,0.14); color: var(--line-frankston); }
+  .badge.confidence-permit { background: rgba(62,124,89,0.14); color: var(--line-glenwaverley); }
+  .badge.confidence-keyword { background: rgba(169,129,46,0.14); color: var(--gold); }
   .property-link {
-    display: inline-block; margin-top: 10px; font-size: 0.82rem;
+    display: inline-block; margin-top: 10px; font-size: 0.8rem;
     color: var(--ink); text-decoration: underline; text-decoration-color: var(--hairline);
   }
 
-  .empty-state {
-    text-align: center; padding: 40px 20px; color: var(--ink-soft);
+  /* ---------- Onboarding (first run only) ---------- */
+  .onboarding {
+    text-align: center; padding: 56px 24px;
+    background: var(--paper-raised); border: 1px solid var(--hairline);
+    border-radius: 14px; box-shadow: var(--shadow);
   }
-  .empty-state h3 { margin-bottom: 8px; color: var(--ink); }
-  .empty-state p { font-size: 0.88rem; line-height: 1.6; max-width: 480px; margin: 0 auto; }
+  .onboarding h3 { font-size: 1.2rem; margin-bottom: 10px; }
+  .onboarding p { font-size: 0.9rem; color: var(--ink-soft); line-height: 1.6; max-width: 420px; margin: 0 auto 20px; }
+  .cta-btn {
+    border: none; background: var(--ink); color: var(--paper-raised);
+    padding: 11px 22px; border-radius: 8px; font-weight: 600; font-size: 0.9rem;
+  }
+  .cta-btn:hover { opacity: 0.88; }
 
-  .seifa-result {
-    margin-top: 10px; font-size: 0.85rem;
-    padding: 10px 12px; border-radius: 6px; background: rgba(27,36,48,0.04);
+  /* ---------- Settings modal ---------- */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(27,36,48,0.45);
+    display: none; align-items: flex-end; justify-content: center; z-index: 50;
   }
+  .modal-overlay.open { display: flex; }
+  .modal-panel {
+    background: var(--paper); width: 100%; max-width: 520px;
+    border-radius: 16px 16px 0 0; padding: 22px 22px 32px;
+    max-height: 88vh; overflow-y: auto; box-shadow: var(--shadow-lg);
+  }
+  @media (min-width: 640px) {
+    .modal-overlay { align-items: center; }
+    .modal-panel { border-radius: 16px; max-height: 80vh; }
+  }
+  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .modal-header h2 { font-size: 1.05rem; }
+  .modal-close { background: none; border: none; color: var(--ink-faint); font-size: 1.3rem; line-height: 1; padding: 4px; }
+  .modal-section { margin-bottom: 20px; }
+  .modal-section h3 { font-size: 0.85rem; font-family: 'Inter', sans-serif; font-weight: 600; margin-bottom: 8px; }
+  .modal-section .helper { font-size: 0.78rem; color: var(--ink-faint); line-height: 1.5; margin-top: 6px; }
+  input[type="text"] {
+    width: 100%; padding: 9px 12px; border: 1px solid var(--hairline);
+    border-radius: 6px; font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem; background: #fff; margin-bottom: 8px;
+  }
+  .btn-row { display: flex; gap: 8px; }
+  .btn {
+    padding: 9px 16px; border: none; border-radius: 6px;
+    background: var(--ink); color: var(--paper-raised);
+    font-weight: 600; font-size: 0.83rem;
+  }
+  .btn:hover { opacity: 0.87; }
+  .btn.secondary { background: transparent; color: var(--ink); border: 1px solid var(--hairline); }
+  .status-line { font-size: 0.78rem; color: var(--ink-soft); margin-top: 6px; }
+  .seifa-result { margin-top: 8px; font-size: 0.83rem; padding: 9px 11px; border-radius: 6px; background: rgba(27,36,48,0.04); }
   .seifa-result .decile { font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: var(--gold); }
 
-  footer {
-    text-align: center; padding: 24px 20px 40px;
-    font-size: 0.75rem; color: var(--ink-soft);
+  details.security-details summary {
+    font-size: 0.78rem; color: var(--ink-faint); cursor: pointer; margin-top: 4px;
   }
+  details.security-details p { font-size: 0.78rem; color: var(--ink-soft); line-height: 1.5; margin-top: 8px; }
+
+  footer { text-align: center; padding: 20px; font-size: 0.72rem; color: var(--ink-faint); }
 
   @media (max-width: 480px) {
     .property-top { flex-direction: column; }
     .score-badge { align-self: flex-start; }
+    .summary-bar { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+    .summary-stat { padding: 10px; }
+    .summary-stat .value { font-size: 1.1rem; }
   }
 </style>
 </head>
@@ -161,10 +196,7 @@
 <header>
   <div class="header-inner">
     <div class="brand-row">
-      <svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <!-- Signature mark: the three rail lines converging at Richmond,
-             with Toorak and Heyington marked — the actual insight this
-             whole model is built on. -->
+      <svg width="42" height="42" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <circle cx="26" cy="26" r="25" stroke="rgba(237,231,220,0.25)" stroke-width="1"/>
         <path d="M8 40 L26 26" stroke="#B8453D" stroke-width="2.2" stroke-linecap="round"/>
         <path d="M44 40 L26 26" stroke="#3E7C59" stroke-width="2.2" stroke-linecap="round"/>
@@ -174,75 +206,79 @@
         <circle cx="44" cy="40" r="2.4" fill="#3E7C59"/>
       </svg>
       <div>
-        <h1>South-East Melbourne Property Scan</h1>
-        <div class="subtitle">Frankston · Glen Waverley · Sandringham lines — via Richmond</div>
+        <h1>South-East Melbourne Scan</h1>
+        <div class="subtitle">Frankston · Glen Waverley · Sandringham lines</div>
       </div>
     </div>
+    <button class="icon-btn" onclick="openModal()" aria-label="Settings">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"></circle>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+      </svg>
+    </button>
   </div>
 </header>
 
 <main>
-
-  <div class="panel">
-    <h2>How this page connects to the web</h2>
-    <p class="security-note">
-      This dashboard reads your <strong>published, read-only</strong> Google Sheet
-      (no login, no credentials) and queries ABS's public SEIFA data directly —
-      both safe to call from a browser. It never touches your Domain API key or
-      Google service account — those stay server-side in your GitHub Actions
-      pipeline, exactly as before, because a browser page can't keep a secret
-      hidden from anyone who opens it.
-    </p>
-    <div class="config-row">
-      <input type="text" id="sheetUrlInput" placeholder="Paste your published-to-web CSV link here (File → Share → Publish to web → CSV)">
-      <button onclick="loadFromSheet()">Load properties</button>
-    </div>
-    <div class="status-line" id="statusLine">Not connected yet — paste your Sheet's published CSV link above.</div>
+  <div id="lastUpdatedRow" style="display:none;" class="last-updated">
+    <span class="dot"></span><span id="lastUpdatedText"></span>
   </div>
 
-  <div class="panel">
-    <h2>Check a suburb's SEIFA score (live from ABS)</h2>
-    <div class="config-row">
-      <input type="text" id="suburbInput" placeholder="e.g. Armadale">
-      <button class="secondary" onclick="checkSeifa()">Check</button>
-    </div>
-    <div id="seifaResult"></div>
+  <div id="summaryBar" class="summary-bar" style="display:none;">
+    <div class="summary-stat"><div class="value" id="statCount">–</div><div class="label">Matches</div></div>
+    <div class="summary-stat"><div class="value" id="statTopScore">–</div><div class="label">Top score</div></div>
+    <div class="summary-stat"><div class="value" id="statMedianPrice">–</div><div class="label">Median price</div></div>
   </div>
 
-  <div class="panel" id="filterPanel" style="display:none;">
-    <h2>Filter &amp; sort</h2>
-    <div class="filters">
-      <select id="typeFilter" onchange="renderProperties()">
-        <option value="">All property types</option>
-        <option value="house">House</option>
-        <option value="townhouse">Townhouse</option>
-        <option value="villa">Villa</option>
-        <option value="apartment_ground_floor">Apartment</option>
-      </select>
-      <select id="sortBy" onchange="renderProperties()">
-        <option value="priority_score">Sort: priority score</option>
-        <option value="price">Sort: price</option>
-        <option value="area_sqm">Sort: area</option>
-      </select>
-      <button class="secondary" onclick="loadFromSheet()">Refresh</button>
-    </div>
+  <div id="filterRow" class="filter-row" style="display:none;">
+    <div class="pill-group" id="typePills"></div>
+    <div class="pill-group" id="sortPills"></div>
   </div>
 
   <div id="propertyList">
-    <div class="empty-state">
-      <h3>No properties loaded yet</h3>
-      <p>Once your GitHub Actions pipeline has run at least once and you've
-         published the results Sheet to the web, paste the CSV link above to
-         see your ranked shortlist here — checkable from your phone, no login
-         required.</p>
+    <div class="onboarding">
+      <h3>Connect your results</h3>
+      <p>This dashboard reads the ranked shortlist your scanner already produced.
+         Connect it once and it'll remember the connection every time you open this page.</p>
+      <button class="cta-btn" onclick="openModal()">Connect your Sheet</button>
     </div>
   </div>
-
 </main>
 
-<footer>
-  Personal buyer-side tool · not a substitute for professional legal/financial advice
-</footer>
+<footer>Personal buyer-side tool · not a substitute for professional legal/financial advice</footer>
+
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this) closeModal()">
+  <div class="modal-panel">
+    <div class="modal-header">
+      <h2>Settings &amp; tools</h2>
+      <button class="modal-close" onclick="closeModal()" aria-label="Close">&times;</button>
+    </div>
+
+    <div class="modal-section">
+      <h3>Sheet connection</h3>
+      <input type="text" id="sheetUrlInput" placeholder="Published-to-web CSV link">
+      <div class="btn-row">
+        <button class="btn" onclick="loadFromSheet()">Save &amp; load</button>
+      </div>
+      <div class="status-line" id="statusLine">Not connected yet.</div>
+      <details class="security-details">
+        <summary>Why is this safe to paste here?</summary>
+        <p>This is a published, read-only link — no login, no credentials. Your Domain API
+           key and Google write-access credentials stay server-side in your GitHub Actions
+           pipeline and are never used by this page.</p>
+      </details>
+    </div>
+
+    <div class="modal-section">
+      <h3>Check a suburb's SEIFA score</h3>
+      <input type="text" id="suburbInput" placeholder="e.g. Armadale">
+      <div class="btn-row">
+        <button class="btn secondary" onclick="checkSeifa()">Check</button>
+      </div>
+      <div id="seifaResult"></div>
+    </div>
+  </div>
+</div>
 
 <script>
 let allProperties = [];
@@ -253,20 +289,45 @@ const LINE_BY_STATION = {
   "Balaclava": "sandringham", "Ripponlea": "sandringham", "Elsternwick": "sandringham",
 };
 
+const TYPE_FILTERS = [
+  { value: "", label: "All" },
+  { value: "house", label: "House" },
+  { value: "townhouse", label: "Townhouse" },
+  { value: "villa", label: "Villa" },
+  { value: "apartment_ground_floor", label: "Apartment" },
+];
+const SORT_OPTIONS = [
+  { value: "priority_score", label: "Priority" },
+  { value: "price", label: "Price" },
+  { value: "area_sqm", label: "Area" },
+];
+let activeType = "";
+let activeSort = "priority_score";
+
+function openModal() { document.getElementById('modalOverlay').classList.add('open'); }
+function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+
+function buildPills(container, options, activeValue, onSelect) {
+  container.innerHTML = options.map(opt =>
+    `<button class="pill ${opt.value === activeValue ? 'active' : ''}" data-value="${opt.value}">${opt.label}</button>`
+  ).join('');
+  container.querySelectorAll('.pill').forEach(btn => {
+    btn.addEventListener('click', () => onSelect(btn.dataset.value));
+  });
+}
+
 function loadFromSheet(isAutoLoad) {
   const url = document.getElementById('sheetUrlInput').value.trim();
   const statusEl = document.getElementById('statusLine');
   if (!url) {
-    statusEl.textContent = "Paste a published CSV link first (see README for how to publish your Sheet).";
+    statusEl.textContent = "Paste a published CSV link first.";
     return;
   }
   if (window.location.protocol === 'file:') {
-    statusEl.innerHTML = "You're opening this file directly (file://) — most browsers block " +
-      "fetching remote data from a local file for security. Serve this folder with " +
-      "<code>python3 -m http.server 8000</code> and open " +
-      "<code>http://localhost:8000/dashboard.html</code> instead. Trying anyway below...";
+    statusEl.innerHTML = "You're opening this via file:// — most browsers block remote fetches " +
+      "from a local file. Serve via <code>python3 -m http.server</code> or host it (e.g. GitHub Pages) instead.";
   } else {
-    statusEl.textContent = isAutoLoad ? "Refreshing your saved link..." : "Loading...";
+    statusEl.textContent = isAutoLoad ? "Refreshing..." : "Loading...";
   }
 
   Papa.parse(url, {
@@ -275,7 +336,7 @@ function loadFromSheet(isAutoLoad) {
     skipEmptyLines: true,
     complete: function(results) {
       if (!results.data || results.data.length === 0) {
-        statusEl.textContent = "Loaded, but found no rows — has the pipeline run yet, or is the Sheet tab empty?";
+        statusEl.textContent = "Connected, but found no rows yet — has the pipeline run?";
         return;
       }
       allProperties = results.data.map(row => ({
@@ -284,44 +345,85 @@ function loadFromSheet(isAutoLoad) {
         price: parseFloat(row.price) || 0,
         area_sqm: parseFloat(row.area_sqm) || 0,
       }));
-      statusEl.textContent = `Loaded ${allProperties.length} properties · last scan: ${allProperties[0].scan_timestamp || 'unknown'}`;
-      document.getElementById('filterPanel').style.display = 'block';
-      renderProperties();
+      statusEl.textContent = `Connected · ${allProperties.length} properties loaded.`;
+      try { localStorage.setItem('propertyScannerSheetUrl', url); } catch (e) {}
 
-      // Remember this link so future visits auto-load without re-pasting.
-      try { localStorage.setItem('propertyScannerSheetUrl', url); } catch (e) { /* ignore if unavailable */ }
+      showData();
+      closeModal();
     },
     error: function(err) {
       const isFileProtocol = window.location.protocol === 'file:';
       statusEl.innerHTML = isFileProtocol
-        ? "Fetch blocked — this is almost certainly the file:// issue above. Serve via " +
-          "<code>python3 -m http.server</code> and reload through <code>http://localhost</code>."
-        : "Couldn't load that link. Two things to check: (1) paste the link directly into a new " +
-          "browser tab — does it show raw CSV text, or a login/error page? If the latter, " +
-          "re-publish via File → Share → Publish to web, choosing CSV format specifically. " +
-          "(2) Open this page's browser console (F12) and look for a red CORS error for the " +
-          "exact reason the request failed.";
+        ? "Fetch blocked by file:// — host this page (e.g. GitHub Pages) instead."
+        : "Couldn't load that link. Check it's a 'Publish to web' CSV link (not a normal share " +
+          "link), and check the browser console (F12) for the specific error.";
       console.error("Sheet load error:", err, "URL attempted:", url);
     }
   });
 }
 
-function renderProperties() {
-  const typeFilter = document.getElementById('typeFilter').value;
-  const sortBy = document.getElementById('sortBy').value;
-  const listEl = document.getElementById('propertyList');
+function showData() {
+  document.getElementById('lastUpdatedRow').style.display = 'flex';
+  document.getElementById('summaryBar').style.display = 'grid';
+  document.getElementById('filterRow').style.display = 'flex';
 
-  let filtered = allProperties.filter(p => !typeFilter || p.property_type === typeFilter);
-  filtered.sort((a, b) => (b[sortBy] || 0) - (a[sortBy] || 0));
+  const ts = allProperties[0].scan_timestamp;
+  let tsText = 'Updated recently';
+  if (ts) {
+    try {
+      const d = new Date(ts);
+      tsText = 'Updated ' + d.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' }) +
+               ', ' + d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+    } catch (e) {}
+  }
+  document.getElementById('lastUpdatedText').textContent = tsText;
+
+  renderTypePills();
+  renderSortPills();
+  renderProperties();
+}
+
+function renderTypePills() {
+  buildPills(document.getElementById('typePills'), TYPE_FILTERS, activeType, (val) => {
+    activeType = val;
+    renderTypePills();
+    renderProperties();
+  });
+}
+function renderSortPills() {
+  buildPills(document.getElementById('sortPills'), SORT_OPTIONS, activeSort, (val) => {
+    activeSort = val;
+    renderSortPills();
+    renderProperties();
+  });
+}
+
+function renderProperties() {
+  const listEl = document.getElementById('propertyList');
+  let filtered = allProperties.filter(p => !activeType || p.property_type === activeType);
+  filtered.sort((a, b) => (b[activeSort] || 0) - (a[activeSort] || 0));
+
+  // Summary stats
+  document.getElementById('statCount').textContent = filtered.length;
+  document.getElementById('statTopScore').textContent = filtered.length
+    ? filtered[0].priority_score.toFixed(2) : '–';
+  if (filtered.length) {
+    const prices = filtered.map(p => p.price).filter(Boolean).sort((a,b) => a-b);
+    const median = prices.length ? prices[Math.floor(prices.length/2)] : null;
+    document.getElementById('statMedianPrice').textContent = median ? '$' + Math.round(median/1000) + 'k' : '–';
+  } else {
+    document.getElementById('statMedianPrice').textContent = '–';
+  }
 
   if (filtered.length === 0) {
-    listEl.innerHTML = `<div class="empty-state"><h3>No matches</h3><p>Try a different property type filter.</p></div>`;
+    listEl.innerHTML = `<div class="onboarding"><h3>No matches</h3><p>Try a different property type filter.</p></div>`;
     return;
   }
 
   listEl.innerHTML = filtered.map(p => {
     const line = LINE_BY_STATION[p.nearest_station] || '';
-    const lineBadge = line ? `<span class="badge line-${line}">${p.nearest_station} · ${line === 'frankston' ? 'Frankston' : line === 'glenwaverley' ? 'Glen Waverley' : 'Sandringham'} line</span>` : '';
+    const lineLabel = line === 'frankston' ? 'Frankston' : line === 'glenwaverley' ? 'Glen Waverley' : 'Sandringham';
+    const lineBadge = line ? `<span class="badge line-${line}">${p.nearest_station} · ${lineLabel} line</span>` : '';
     const confBadgeClass = p.renovation_confidence === 'permit_record' ? 'confidence-permit'
                           : p.renovation_confidence === 'keyword_signal' ? 'confidence-keyword' : '';
     const confBadge = p.renovation_confidence ? `<span class="badge ${confBadgeClass}">reno: ${p.renovation_confidence.replace('_',' ')}</span>` : '';
@@ -370,7 +472,7 @@ async function checkSeifa() {
     const data = await resp.json();
     const features = data.features || [];
     if (features.length === 0) {
-      resultEl.innerHTML = `<div class="seifa-result">No match found for "${suburb}" — try the exact suburb name (e.g. "Malvern East" not "Malvern east vic").</div>`;
+      resultEl.innerHTML = `<div class="seifa-result">No match found for "${suburb}" — try the exact suburb name.</div>`;
       return;
     }
     resultEl.innerHTML = features.map(f => {
@@ -386,9 +488,6 @@ async function checkSeifa() {
   }
 }
 
-// On page open, auto-fill and auto-load the last-used Sheet link, so you
-// don't have to re-paste it every visit — this is what makes checking
-// from your phone actually convenient.
 window.addEventListener('DOMContentLoaded', function() {
   try {
     const savedUrl = localStorage.getItem('propertyScannerSheetUrl');
