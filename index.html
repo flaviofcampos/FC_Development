@@ -253,7 +253,7 @@ const LINE_BY_STATION = {
   "Balaclava": "sandringham", "Ripponlea": "sandringham", "Elsternwick": "sandringham",
 };
 
-function loadFromSheet() {
+function loadFromSheet(isAutoLoad) {
   const url = document.getElementById('sheetUrlInput').value.trim();
   const statusEl = document.getElementById('statusLine');
   if (!url) {
@@ -266,7 +266,7 @@ function loadFromSheet() {
       "<code>python3 -m http.server 8000</code> and open " +
       "<code>http://localhost:8000/dashboard.html</code> instead. Trying anyway below...";
   } else {
-    statusEl.textContent = "Loading...";
+    statusEl.textContent = isAutoLoad ? "Refreshing your saved link..." : "Loading...";
   }
 
   Papa.parse(url, {
@@ -287,6 +287,9 @@ function loadFromSheet() {
       statusEl.textContent = `Loaded ${allProperties.length} properties · last scan: ${allProperties[0].scan_timestamp || 'unknown'}`;
       document.getElementById('filterPanel').style.display = 'block';
       renderProperties();
+
+      // Remember this link so future visits auto-load without re-pasting.
+      try { localStorage.setItem('propertyScannerSheetUrl', url); } catch (e) { /* ignore if unavailable */ }
     },
     error: function(err) {
       const isFileProtocol = window.location.protocol === 'file:';
@@ -382,6 +385,19 @@ async function checkSeifa() {
     resultEl.innerHTML = `<div class="seifa-result">Couldn't reach ABS's service right now — try again shortly.</div>`;
   }
 }
+
+// On page open, auto-fill and auto-load the last-used Sheet link, so you
+// don't have to re-paste it every visit — this is what makes checking
+// from your phone actually convenient.
+window.addEventListener('DOMContentLoaded', function() {
+  try {
+    const savedUrl = localStorage.getItem('propertyScannerSheetUrl');
+    if (savedUrl) {
+      document.getElementById('sheetUrlInput').value = savedUrl;
+      loadFromSheet(true);
+    }
+  } catch (e) { /* localStorage unavailable — just skip auto-load */ }
+});
 </script>
 
 </body>
