@@ -1,0 +1,26 @@
+name: Melbourne Property Scan
+
+on:
+  schedule:
+    - cron: "0 21 * * 0,2,4"   # Sun/Tue/Thu 21:00 UTC = Mon/Wed/Fri ~7am AEST
+  workflow_dispatch: {}
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run property scan
+        env:
+          DOMAIN_API_KEY: ${{ secrets.DOMAIN_API_KEY }}
+          APPS_SCRIPT_WEB_APP_URL: ${{ secrets.APPS_SCRIPT_WEB_APP_URL }}
+          APPS_SCRIPT_SHARED_SECRET: ${{ secrets.APPS_SCRIPT_SHARED_SECRET }}
+        run: python3 main.py
